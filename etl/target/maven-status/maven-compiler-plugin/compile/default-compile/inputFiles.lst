@@ -1,0 +1,15 @@
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/SharpForgeEtlApplication.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/OddsApiClient.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/SportsDataApiClient.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/dto/OddsApiDto.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/dto/SportsDataDto.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/config/SharpForgeProperties.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/config/WebClientConfig.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/model/EtlModels.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/repository/EtlBatchRepository.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/scheduler/EtlScheduler.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/service/OddsIngestionService.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/service/SportsDataIngestionService.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/transform/AdvancedStatsTransformer.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/transform/RestDaysCalculator.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/transform/StreakCalculator.java
