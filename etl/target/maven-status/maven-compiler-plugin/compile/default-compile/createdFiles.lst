@@ -6,6 +6,7 @@ com/sharpforge/etl/model/EtlModels$WeatherRecord.class
 com/sharpforge/etl/client/SportsDataApiClient.class
 com/sharpforge/etl/repository/EtlBatchRepository$GameHistoryRow.class
 com/sharpforge/etl/model/EtlModels$WeatherRecord$WeatherRecordBuilder.class
+com/sharpforge/etl/api/backtest/TrendyBotController$TrendyBotRequest.class
 com/sharpforge/etl/api/backtest/BacktestController.class
 com/sharpforge/etl/client/dto/OddsApiDto$Event.class
 com/sharpforge/etl/transform/StreakCalculator$GameResult.class
@@ -72,6 +73,7 @@ com/sharpforge/etl/config/SharpForgeProperties$Etl$Rest.class
 com/sharpforge/etl/model/EtlModels$LineMovementRecord$LineMovementRecordBuilder.class
 com/sharpforge/etl/model/EtlModels$ConsensusOddsRecord$ConsensusOddsRecordBuilder.class
 com/sharpforge/etl/model/EtlModels$GameAdvancedRecord$GameAdvancedRecordBuilder.class
+com/sharpforge/etl/api/backtest/TrendyBotParser.class
 com/sharpforge/etl/model/EtlModels$LineMovementRecord.class
 com/sharpforge/etl/api/backtest/BacktestResponseDto.class
 com/sharpforge/etl/api/backtest/BacktestRequestDto$PublicBettingFilters.class
@@ -81,5 +83,6 @@ com/sharpforge/etl/config/SharpForgeProperties$Etl.class
 com/sharpforge/etl/model/EtlModels$GameOfficialRecord$GameOfficialRecordBuilder.class
 com/sharpforge/etl/client/dto/OddsApiDto$Outcome.class
 com/sharpforge/etl/client/dto/SportsDataDto$TeamGameStats.class
+com/sharpforge/etl/api/backtest/TrendyBotController.class
 com/sharpforge/etl/api/backtest/BacktestService$1.class
 com/sharpforge/etl/client/dto/OddsApiDto$Bookmaker.class

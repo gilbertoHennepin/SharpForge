@@ -104,6 +104,38 @@ export default function TrendBuilder() {
         {/* Workspace */}
         <main className="flex-1 overflow-y-auto p-8 flex flex-col gap-8 relative z-0">
           
+          {/* TrendyBot AI Input */}
+          <div className="glass-panel p-2 rounded-2xl flex items-center gap-3 relative shadow-[0_0_20px_rgba(112,0,255,0.15)] border-[#7000ff]/30 focus-within:border-[#00f0ff]/50 focus-within:shadow-[0_0_30px_rgba(0,240,255,0.2)] transition-all">
+            <div className="p-3 bg-gradient-to-br from-[#7000ff] to-[#bd00ff] rounded-xl flex-shrink-0">
+              <Database className="w-5 h-5 text-white" />
+            </div>
+            <input 
+              type="text"
+              placeholder="Ask TrendyBot: e.g., 'Show me NFL trends for road favorites on a 5+ game losing streak'"
+              className="flex-1 bg-transparent border-none text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-0 font-medium"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = e.currentTarget.value;
+                  if (val.toLowerCase().includes('nfl')) {
+                    handleAddFilter({ id: 'league', category: 'League', label: 'NFL', value: 1 });
+                  }
+                  if (val.toLowerCase().includes('road favorite') || val.toLowerCase().includes('away fav')) {
+                    handleAddFilter({ id: 'bet_target', category: 'Target', label: 'Away Spread', value: 'AWAY_SPREAD' });
+                    handleAddFilter({ id: 'odds_spread_min', category: 'Min Spread', label: 'Home Dog (+0.5)', value: 0.5 });
+                  }
+                  if (val.toLowerCase().includes('losing streak')) {
+                    handleAddFilter({ id: 'str_su_loss', category: 'Min SU Loss Streak', label: '5 Games', value: 5 });
+                  }
+                  e.currentTarget.value = '';
+                  setTimeout(handleRunBacktest, 500); // auto run
+                }
+              }}
+            />
+            <button className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-sm transition-colors uppercase tracking-wider">
+              Parse
+            </button>
+          </div>
+
           {/* Staging Area */}
           <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4 min-h-[160px]">
             <div className="flex items-center gap-2 text-slate-300">

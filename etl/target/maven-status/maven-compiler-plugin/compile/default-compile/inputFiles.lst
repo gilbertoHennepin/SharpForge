@@ -5,6 +5,8 @@
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestResponseDto.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestService.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/StatisticalSignificanceUtil.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/TrendyBotController.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/TrendyBotParser.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/OddsApiClient.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/SportsDataApiClient.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/dto/OddsApiDto.java
