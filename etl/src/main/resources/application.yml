@@ -1,0 +1,179 @@
+spring:
+  application:
+    name: sharpforge-etl
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sharpforge}
+    username: ${DB_USER:sharpforge}
+    password: ${DB_PASSWORD:sharpforge}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: SharpForgePool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  jooq:
+    sql-dialect: POSTGRES
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+  task:
+    scheduling:
+      pool:
+        size: 8
+
+# ── External API Configuration ──────────────────────────────────────────────
+sharpforge:
+  apis:
+    odds-api:
+      base-url: ${ODDS_API_BASE_URL:https://api.the-odds-api.com/v4}
+      api-key: ${ODDS_API_KEY:your-key-here}
+      # Sports keys supported by The Odds API
+      sports:
+        - americanfootball_nfl
+        - americanfootball_ncaaf
+        - basketball_nba
+        - basketball_ncaab
+        - baseball_mlb
+        - icehockey_nhl
+      # Markets to fetch per game
+      markets:
+        - h2h         # moneyline
+        - spreads     # ATS
+        - totals      # over/under
+      bookmakers:
+        - draftkings
+        - fanduel
+        - betmgm
+        - caesars
+        - pinnacle
+        - betonlineag
+      regions: us,us2
+      odds-format: american
+      connect-timeout-ms: 5000
+      read-timeout-ms: 10000
+      # API quota tracking (500 requests/month free tier)
+      quota-warn-threshold: 450
+
+    sports-data-api:
+      base-url: ${SPORTS_DATA_BASE_URL:https://api.sportsdata.io/v3}
+      api-key: ${SPORTS_DATA_API_KEY:your-key-here}
+      connect-timeout-ms: 5000
+      read-timeout-ms: 15000
+
+    weather-api:
+      base-url: ${WEATHER_API_BASE_URL:https://api.openweathermap.org/data/3.0}
+      api-key: ${WEATHER_API_KEY:your-key-here}
+      # Hours before game to fetch forecast
+      forecast-lead-hours: 72
+      connect-timeout-ms: 3000
+      read-timeout-ms: 8000
+
+  # ── Scheduling Cron Expressions ────────────────────────────────────────────
+  schedule:
+    # Fetch odds updates every 15 min during peak betting hours (Mon-Sun 8am-11pm CT)
+    odds-refresh-cron: "0 0/15 8-23 * * MON-SUN"
+    # Full historical backfill once daily at 2am CT
+    historical-backfill-cron: "0 0 2 * * *"
+    # Weather refresh 6 hours before each game (runs every 30 min to check upcoming games)
+    weather-refresh-cron: "0 0/30 * * * *"
+    # Referee assignments published 24hrs before kickoff
+    referee-refresh-cron: "0 0 10 * * MON-SUN"
+    # Play-by-play ingestion — runs every 5 min during game windows
+    pbp-ingest-cron: "0 0/5 12-23 * * *"
+    # Streak recalculation after results post (daily 6am)
+    streak-recalc-cron: "0 0 6 * * *"
+    # Backtest MV refresh (nightly 3am)
+    mv-refresh-cron: "0 0 3 * * *"
+
+  # ── ETL Processing Settings ────────────────────────────────────────────────
+  etl:
+    # Days of historical odds to backfill on startup
+    historical-backfill-days: 1825   # 5 years
+    # jOOQ batch insert chunk size
+    batch-size: 500
+    # Max parallel game processing threads
+    game-parallelism: 8
+    # Minimum games required before streak stats are meaningful
+    min-games-for-streak: 3
+    # Rest day thresholds
+    rest:
+      short-week-threshold-days: 6   # NFL short week
+      long-week-threshold-days: 14   # NFL bye week equivalent
+
+# ── Resilience4j ─────────────────────────────────────────────────────────────
+resilience4j:
+  retry:
+    instances:
+      odds-api:
+        max-attempts: 4
+        wait-duration: 2s
+        exponential-backoff-multiplier: 2.0
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+      sports-data-api:
+        max-attempts: 3
+        wait-duration: 3s
+        exponential-backoff-multiplier: 1.5
+      weather-api:
+        max-attempts: 3
+        wait-duration: 2s
+  circuit-breaker:
+    instances:
+      odds-api:
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 80
+        slow-call-duration-threshold: 8s
+        sliding-window-size: 20
+        wait-duration-in-open-state: 60s
+      sports-data-api:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        wait-duration-in-open-state: 30s
+  rate-limiter:
+    instances:
+      odds-api:
+        # The Odds API: 500 requests/month on free tier → ~1 req/hour budget
+        # On paid tiers raise this significantly
+        limit-for-period: 10
+        limit-refresh-period: 1m
+        timeout-duration: 5s
+
+# ── Actuator ─────────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,scheduledtasks
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.sharpforge: DEBUG
+    org.jooq.tools.LoggerListener: DEBUG
+    org.springframework.scheduling: INFO
+    io.github.resilience4j: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{sport}/%X{gameId}] %logger{36} - %msg%n"
