@@ -1,4 +1,9 @@
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/SharpForgeEtlApplication.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestController.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestQueryBuilder.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestRequestDto.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestResponseDto.java
+/Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/api/backtest/BacktestService.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/OddsApiClient.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/SportsDataApiClient.java
 /Users/chapulin/SharpForge/etl/src/main/java/com/sharpforge/etl/client/dto/OddsApiDto.java
