@@ -26,6 +26,7 @@ public class BacktestService {
 
     private final DSLContext dsl;
     private final BacktestQueryBuilder queryBuilder;
+    private final StatisticalSignificanceUtil statUtil;
 
     private static final BigDecimal JUICE_STD = BigDecimal.valueOf(1.10); // standard -110 juice = risk 1.1 to win 1.0
 
@@ -105,6 +106,9 @@ public class BacktestService {
                     .divide(totalRisked, 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
+        double pValue = statUtil.calculatePValue(wins, losses);
+        String confidence = statUtil.determineConfidence(pValue, wins + losses);
+
         BacktestResponseDto.Summary summary = BacktestResponseDto.Summary.builder()
                 .totalGames(totalGames)
                 .wins(wins)
@@ -113,6 +117,8 @@ public class BacktestService {
                 .winRatePct(winRate)
                 .roiPct(roi)
                 .unitsWon(totalUnits.setScale(2, RoundingMode.HALF_UP))
+                .pValue(pValue)
+                .confidenceLevel(confidence)
                 .build();
 
         // Pagination

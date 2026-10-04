@@ -31,6 +31,8 @@ public class BacktestResponseDto {
         private BigDecimal winRatePct;
         private BigDecimal roiPct;
         private BigDecimal unitsWon;
+        private Double pValue;
+        private String confidenceLevel;
     }
 
     @Data

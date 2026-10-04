@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Target, DollarSign, ListOrdered, Calendar } from "lucide-react";
+import { TrendingUp, Target, DollarSign, ListOrdered, Calendar, AlertTriangle, ShieldCheck } from "lucide-react";
 
 type ResultsWidgetProps = {
   isRunning: boolean;
@@ -10,7 +10,15 @@ type ResultsWidgetProps = {
 };
 
 export default function ResultsWidget({ isRunning, results }: ResultsWidgetProps) {
-  
+  const [showWarning, setShowWarning] = useState(false);
+
+  // Trigger modal if results exist and confidence is low
+  useEffect(() => {
+    if (results?.confidenceLevel === "LOW") {
+      setShowWarning(true);
+    }
+  }, [results]);
+
   if (!isRunning && !results) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50 relative z-0">
@@ -24,9 +32,53 @@ export default function ResultsWidget({ isRunning, results }: ResultsWidgetProps
     );
   }
 
+  const confidenceColors: any = {
+    HIGH: "text-green-400 border-green-400/30 shadow-[0_0_15px_rgba(74,222,128,0.2)]",
+    MEDIUM: "text-yellow-400 border-yellow-400/30 shadow-[0_0_15px_rgba(250,204,21,0.2)]",
+    LOW: "text-red-500 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]",
+  };
+
   return (
     <div className="flex-1 relative z-0 flex flex-col gap-6">
       
+      {/* SHARP TRAP WARNING MODAL */}
+      <AnimatePresence>
+        {showWarning && results && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              className="max-w-md w-full bg-[#0f172a] border border-red-500/50 rounded-2xl p-6 shadow-[0_0_50px_rgba(239,68,68,0.15)] relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-orange-500" />
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-red-500/10 text-red-500">
+                  <AlertTriangle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-bold text-white mb-2">The "Sharp Trap" Warning</h3>
+                  <p className="text-sm text-slate-300 leading-relaxed">
+                    This trend shows an impressive <strong className="text-white">{results.winRate}% win rate</strong>, but it only matches <strong className="text-white">{results.totalMatches} historical games</strong>.
+                  </p>
+                  <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+                    <strong>Statistical Significance (p-value):</strong> {(results.pValue || 0).toFixed(4)}<br/>
+                    When sample sizes are small, high win rates are often just variance (luck). We recommend removing 1 or 2 strict filters to test if the underlying theory holds up across a larger dataset.
+                  </p>
+                  <button 
+                    onClick={() => setShowWarning(false)}
+                    className="mt-6 w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold transition-colors"
+                  >
+                    I understand the risk
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {isRunning ? (
           <motion.div
@@ -64,6 +116,23 @@ export default function ResultsWidget({ isRunning, results }: ResultsWidgetProps
             transition={{ duration: 0.5, staggerChildren: 0.1 }}
             className="w-full space-y-6"
           >
+            
+            {/* Confidence Meter */}
+            <div className={`glass-panel px-6 py-4 rounded-xl border flex items-center justify-between ${confidenceColors[results.confidenceLevel || 'MEDIUM']}`}>
+              <div className="flex items-center gap-3">
+                {results.confidenceLevel === 'HIGH' ? <ShieldCheck className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+                <div>
+                  <h4 className="text-sm font-bold uppercase tracking-wider">Statistical Confidence: {results.confidenceLevel}</h4>
+                  <p className="text-xs opacity-80">p-value: {(results.pValue || 0).toFixed(4)} (Sample size: {results.totalMatches})</p>
+                </div>
+              </div>
+              <div className="flex gap-1 h-2 w-32 bg-black/50 rounded-full overflow-hidden">
+                <div className={`h-full flex-1 ${results.confidenceLevel === 'LOW' ? 'bg-red-500' : 'bg-white/20'}`} />
+                <div className={`h-full flex-1 ${results.confidenceLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-white/20'}`} />
+                <div className={`h-full flex-1 ${results.confidenceLevel === 'HIGH' ? 'bg-green-400' : 'bg-white/20'}`} />
+              </div>
+            </div>
+
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
@@ -144,7 +213,6 @@ export default function ResultsWidget({ isRunning, results }: ResultsWidgetProps
         ) : null}
       </AnimatePresence>
       
-      {/* Tailwind animation keyframes injected via class arbitrary variants or simple style block */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer {
           100% { transform: translateX(100%); }

@@ -46,14 +46,18 @@ export default function TrendBuilder() {
     
     console.log("Serialized Backtest Payload:", JSON.stringify(payload, null, 2));
 
-    // Simulated Response
+    // Simulated Response Logic based on number of filters to demo Sharp Trap
+    const isOverfitted = filters.length >= 3;
+    
     setResults({
-      roi: 12.4,
-      winRate: 56.8,
-      netProfit: 14.2,
-      totalMatches: 843,
-      wins: 479,
-      losses: 364
+      roi: isOverfitted ? 28.5 : 12.4,
+      winRate: isOverfitted ? 80.0 : 56.8,
+      netProfit: isOverfitted ? 4.2 : 14.2,
+      totalMatches: isOverfitted ? 12 : 843,
+      wins: isOverfitted ? 10 : 479,
+      losses: isOverfitted ? 2 : 364,
+      pValue: isOverfitted ? 0.22 : 0.003,
+      confidenceLevel: isOverfitted ? "LOW" : "HIGH"
     });
     
     setIsRunning(false);
