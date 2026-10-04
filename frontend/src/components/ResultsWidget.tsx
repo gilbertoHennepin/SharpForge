@@ -133,6 +133,22 @@ export default function ResultsWidget({ isRunning, results }: ResultsWidgetProps
               </div>
             </div>
 
+            {/* Active Games Tonight Banner */}
+            {results.activeGamesTonight !== undefined && (
+              <div className="glass-panel p-4 rounded-xl border border-[#7000ff]/30 bg-gradient-to-r from-[#7000ff]/10 to-transparent flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex h-3 w-3">
+                    {results.activeGamesTonight > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00f0ff] opacity-75"></span>}
+                    <span className={`relative inline-flex rounded-full h-3 w-3 ${results.activeGamesTonight > 0 ? 'bg-[#00f0ff]' : 'bg-slate-600'}`}></span>
+                  </div>
+                  <span className="font-bold text-white tracking-wider">ACTIVE GAMES TONIGHT</span>
+                </div>
+                <div className="text-2xl font-display font-bold text-[#00f0ff]">
+                  {results.activeGamesTonight} MATCHES
+                </div>
+              </div>
+            )}
+
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
