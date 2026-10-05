@@ -45,33 +45,33 @@ function SortableFilterChip({ filter, onRemove }: { filter: FilterChip, onRemove
   );
 }
 
-export default function TrendBuilder() {
-  const [filters, setFilters] = useState<FilterChip[]>([]);
+export default function TrendBuilder({ initialFilters = [], onFiltersChange }: { initialFilters?: FilterChip[], onFiltersChange?: (filters: FilterChip[]) => void }) {
+  const [filters, setFilters] = useState<FilterChip[]>(initialFilters);
   const [isRunning, setIsRunning] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [isSaved, setIsSaved] = useState(false);
 
-  const handleAddFilter = (filter: FilterChip) => {
-    setFilters((prev) => {
-      const filtered = prev.filter((f) => f.id !== filter.id);
-      return [...filtered, filter];
-    });
+  // Sync with parent when filters change internally
+  const updateFilters = (newFilters: FilterChip[]) => {
+    setFilters(newFilters);
+    if (onFiltersChange) onFiltersChange(newFilters);
     setIsSaved(false);
   };
 
+  const handleAddFilter = (filter: FilterChip) => {
+    updateFilters([...filters.filter((f) => f.id !== filter.id), filter]);
+  };
+
   const handleRemoveFilter = (id: string) => {
-    setFilters((prev) => prev.filter((f) => f.id !== id));
-    setIsSaved(false);
+    updateFilters(filters.filter((f) => f.id !== id));
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      setFilters((items) => {
-        const oldIndex = items.findIndex(i => i.id === active.id);
-        const newIndex = items.findIndex(i => i.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const oldIndex = filters.findIndex(i => i.id === active.id);
+      const newIndex = filters.findIndex(i => i.id === over.id);
+      updateFilters(arrayMove(filters, oldIndex, newIndex));
     }
   };
 
@@ -83,17 +83,23 @@ export default function TrendBuilder() {
     
     await new Promise((resolve) => setTimeout(resolve, 2000));
     
+    // Generate dynamic fake results to simulate complex queries
     const isOverfitted = filters.length >= 3;
+    const baseWin = 52.0 + (filters.length * 2.1) + (Math.random() * 5);
+    const baseRoi = (baseWin - 52.38) * 1.5;
+    const matchCount = Math.floor(Math.max(10, 1000 - (filters.length * 300) + (Math.random() * 100)));
+    const wins = Math.floor(matchCount * (baseWin / 100));
+    
     setResults({
-      roi: isOverfitted ? 28.5 : 12.4,
-      winRate: isOverfitted ? 80.0 : 56.8,
-      netProfit: isOverfitted ? 4.2 : 14.2,
-      totalMatches: isOverfitted ? 12 : 843,
-      wins: isOverfitted ? 10 : 479,
-      losses: isOverfitted ? 2 : 364,
-      pValue: isOverfitted ? 0.22 : 0.003,
-      confidenceLevel: isOverfitted ? "LOW" : "HIGH",
-      activeGamesTonight: isOverfitted ? 0 : 3
+      roi: parseFloat(baseRoi.toFixed(2)),
+      winRate: parseFloat(baseWin.toFixed(2)),
+      netProfit: parseFloat(((wins) - ((matchCount - wins) * 1.1)).toFixed(2)),
+      totalMatches: matchCount,
+      wins: wins,
+      losses: matchCount - wins,
+      pValue: isOverfitted ? (Math.random() * 0.3) : (0.001 + Math.random() * 0.04),
+      confidenceLevel: isOverfitted && matchCount < 50 ? "LOW" : (matchCount > 200 ? "HIGH" : "MEDIUM"),
+      activeGamesTonight: Math.floor(Math.random() * 4)
     });
     
     setIsRunning(false);
@@ -101,7 +107,6 @@ export default function TrendBuilder() {
 
   const handleSaveTrend = () => {
     setIsSaved(true);
-    // Here we would call the Backend API to save this trend for daily monitoring alerts
   };
 
   return (
@@ -161,13 +166,23 @@ export default function TrendBuilder() {
               className="flex-1 bg-transparent border-none text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-0 font-medium"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  const val = e.currentTarget.value;
-                  if (val.toLowerCase().includes('nfl')) handleAddFilter({ id: 'league', category: 'League', label: 'NFL', value: 1 });
-                  if (val.toLowerCase().includes('road favorite') || val.toLowerCase().includes('away fav')) {
-                    handleAddFilter({ id: 'bet_target', category: 'Target', label: 'Away Spread', value: 'AWAY_SPREAD' });
-                    handleAddFilter({ id: 'odds_spread_min', category: 'Min Spread', label: 'Home Dog (+0.5)', value: 0.5 });
+                  const val = e.currentTarget.value.toLowerCase();
+                  let newFilters = [...filters];
+                  
+                  if (val.includes('nfl')) newFilters.push({ id: 'league', category: 'League', label: 'NFL', value: 1 });
+                  if (val.includes('nba')) newFilters.push({ id: 'league', category: 'League', label: 'NBA', value: 3 });
+                  if (val.includes('road favorite') || val.includes('away fav')) {
+                    newFilters.push({ id: 'bet_target', category: 'Target', label: 'Away Spread', value: 'AWAY_SPREAD' });
+                    newFilters.push({ id: 'odds_spread_min', category: 'Min Spread', label: 'Home Dog (+0.5)', value: 0.5 });
                   }
-                  if (val.toLowerCase().includes('losing streak')) handleAddFilter({ id: 'str_su_loss', category: 'Min SU Loss Streak', label: '5 Games', value: 5 });
+                  if (val.includes('home underdog') || val.includes('home dog')) {
+                    newFilters.push({ id: 'bet_target', category: 'Target', label: 'Home Spread', value: 'HOME_SPREAD' });
+                    newFilters.push({ id: 'odds_spread_min', category: 'Min Spread', label: 'Home Dog (+0.5)', value: 0.5 });
+                  }
+                  if (val.includes('losing streak')) newFilters.push({ id: 'str_su_loss', category: 'Min SU Loss Streak', label: '3+ Games', value: 3 });
+                  if (val.includes('wind') || val.includes('windy')) newFilters.push({ id: 'wx_high_wind', category: 'Smart Weather', label: 'High Wind (>15mph)', value: true });
+                  
+                  updateFilters(newFilters);
                   e.currentTarget.value = '';
                   setTimeout(handleRunBacktest, 500);
                 }

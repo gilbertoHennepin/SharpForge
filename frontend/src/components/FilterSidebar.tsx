@@ -71,13 +71,36 @@ export default function FilterSidebar({ onAddFilter, activeFilters }: FilterSide
       ]
     },
     {
+      id: "matchup",
+      title: "Teams & Matchup",
+      icon: <Users className="w-4 h-4" />,
+      color: "from-[#ff00aa] to-[#7000ff]",
+      items: [
+        { id: "divisional_game", label: "Divisional Matchup", type: "boolean" },
+        { id: "conference_game", label: "Conference Matchup", type: "boolean" },
+        { id: "home_team", label: "Specific Home Team", type: "select", options: ["All", "PHI", "KC", "DAL", "BUF", "SF"] },
+      ]
+    },
+    {
+      id: "timing",
+      title: "Timing & Schedule",
+      icon: <Calendar className="w-4 h-4" />,
+      color: "from-[#ff5500] to-[#ffaa00]",
+      items: [
+        { id: "primetime", label: "Primetime (Night Games)", type: "boolean" },
+        { id: "day_of_week", label: "Day of Week", type: "select", options: ["Any", "Sunday", "Monday", "Thursday", "Saturday"] },
+        { id: "month", label: "Specific Month", type: "select", options: ["Any", "September", "October", "November", "December", "January"] },
+      ]
+    },
+    {
       id: "weather",
-      title: "Weather",
+      title: "Smart Weather",
       icon: <CloudLightning className="w-4 h-4" />,
       color: "from-[#00ffaa] to-[#00aaee]",
       items: [
-        { id: "wx_wind_min", label: "Min Wind Speed (mph)", type: "range", min: 0, max: 40, default: 15 },
-        { id: "wx_temp_max", label: "Max Temp (°F)", type: "range", min: -20, max: 120, default: 35 },
+        { id: "wx_high_wind", label: "High Wind (>15mph)", type: "boolean" },
+        { id: "wx_extreme_cold", label: "Extreme Cold (<32°F)", type: "boolean" },
+        { id: "wx_heavy_rain", label: "Heavy Precipitation", type: "boolean" },
         { id: "wx_exclude_dome", label: "Exclude Domes", type: "boolean" },
       ]
     },

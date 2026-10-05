@@ -3,8 +3,9 @@
 import React from "react";
 import { CheckCircle, TrendingUp, Users, Calendar, Activity, Database } from "lucide-react";
 import { motion } from "framer-motion";
+import { FilterChip } from "./TrendBuilder";
 
-export default function DiscoverFeed() {
+export default function DiscoverFeed({ onLoadSystem }: { onLoadSystem?: (filters: FilterChip[]) => void }) {
   const verifiedSystems = [
     {
       id: 1,
@@ -16,7 +17,14 @@ export default function DiscoverFeed() {
       profit: "+45.2u",
       matches: 124,
       activeGames: 1,
-      filters: ["Away Spread", "Rest > 7", "Public < 40%"]
+      filters: ["Away Spread", "Rest > 7", "Public < 40%"],
+      filterObjects: [
+        { id: "league_id", category: "League", label: "NFL", value: 1 },
+        { id: "bet_target", category: "Target", label: "Away Spread", value: "AWAY_SPREAD" },
+        { id: "odds_spread_min", category: "Min Spread", label: "Home Dog (+0.5)", value: 0.5 },
+        { id: "sched_rest_min", category: "Min Rest Advantage", label: "7 Days", value: 7 },
+        { id: "pub_ticket_max", category: "Max Public Ticket %", label: "40%", value: 40 }
+      ]
     },
     {
       id: 2,
@@ -28,7 +36,13 @@ export default function DiscoverFeed() {
       profit: "+31.8u",
       matches: 312,
       activeGames: 0,
-      filters: ["Home Spread", "SU Loss Streak >= 2"]
+      filters: ["Home Spread", "SU Loss Streak >= 2"],
+      filterObjects: [
+        { id: "league_id", category: "League", label: "NBA", value: 3 },
+        { id: "bet_target", category: "Target", label: "Home Spread", value: "HOME_SPREAD" },
+        { id: "odds_spread_max", category: "Max Spread", label: "Home Fav (-0.5)", value: -0.5 },
+        { id: "str_su_loss", category: "Min SU Loss Streak", label: "2 Games", value: 2 }
+      ]
     },
     {
       id: 3,
@@ -40,7 +54,13 @@ export default function DiscoverFeed() {
       profit: "+22.5u",
       matches: 485,
       activeGames: 3,
-      filters: ["Under", "Wind >= 15mph", "Exclude Domes"]
+      filters: ["Under", "Wind >= 15mph", "Exclude Domes"],
+      filterObjects: [
+        { id: "league_id", category: "League", label: "MLB", value: 4 },
+        { id: "bet_target", category: "Target", label: "Under", value: "UNDER" },
+        { id: "wx_high_wind", category: "Smart Weather", label: "High Wind (>15mph)", value: true },
+        { id: "wx_exclude_dome", category: "Smart Weather", label: "Exclude Domes", value: true }
+      ]
     }
   ];
 
@@ -117,7 +137,10 @@ export default function DiscoverFeed() {
                   <button className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-sm transition-colors">
                     View Logs
                   </button>
-                  <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7000ff] to-[#00f0ff] text-white font-bold text-sm hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all">
+                  <button 
+                    onClick={() => onLoadSystem && onLoadSystem(sys.filterObjects)}
+                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7000ff] to-[#00f0ff] text-white font-bold text-sm hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all"
+                  >
                     Load into Builder
                   </button>
                 </div>

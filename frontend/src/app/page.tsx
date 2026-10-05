@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { Database, CheckCircle } from "lucide-react";
-import TrendBuilder from "@/components/TrendBuilder";
+import TrendBuilder, { FilterChip } from "@/components/TrendBuilder";
 import DiscoverFeed from "@/components/DiscoverFeed";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"builder" | "discover">("builder");
+  const [globalFilters, setGlobalFilters] = useState<FilterChip[]>([]);
 
   return (
     <div className="flex h-screen w-full bg-[#020617] text-slate-300">
@@ -46,7 +47,19 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
-        {activeTab === "builder" ? <TrendBuilder /> : <DiscoverFeed />}
+        {activeTab === "builder" ? (
+          <TrendBuilder 
+            initialFilters={globalFilters} 
+            onFiltersChange={setGlobalFilters} 
+          />
+        ) : (
+          <DiscoverFeed 
+            onLoadSystem={(systemFilters) => {
+              setGlobalFilters(systemFilters);
+              setActiveTab("builder");
+            }} 
+          />
+        )}
       </main>
 
     </div>
