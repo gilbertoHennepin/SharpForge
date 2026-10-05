@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, Plus, TrendingUp, Users, Calendar, CloudLightning, ActivitySquare } from "lucide-react";
+import { ChevronDown, Plus, TrendingUp, Users, Calendar, CloudLightning, ActivitySquare, Target } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FilterChip } from "./TrendBuilder";
 
@@ -28,6 +28,16 @@ export default function FilterSidebar({ onAddFilter, activeFilters }: FilterSide
   };
 
   const SECTIONS: MenuSection[] = [
+    {
+      id: "league_target",
+      title: "League & Target",
+      icon: <Target className="w-4 h-4" />,
+      color: "from-[#ff00aa] to-[#7000ff]",
+      items: [
+        { id: "league_id", label: "Select League", type: "select", options: ["NFL", "NBA", "MLB", "NHL", "NCAAF", "NCAAB"] },
+        { id: "bet_target", label: "Bet Target", type: "select", options: ["Home Spread", "Away Spread", "Over", "Under", "Favorite", "Underdog"] },
+      ]
+    },
     {
       id: "line_info",
       title: "Line Info",
@@ -79,6 +89,16 @@ export default function FilterSidebar({ onAddFilter, activeFilters }: FilterSide
       items: [
         { id: "str_ats_win", label: "Min ATS Win Streak", type: "number", placeholder: "e.g. 3" },
         { id: "str_su_loss", label: "Min SU Loss Streak", type: "number", placeholder: "e.g. 2" },
+      ]
+    },
+    {
+      id: "personnel",
+      title: "Personnel & Refs",
+      icon: <Users className="w-4 h-4" />,
+      color: "from-[#00ffaa] to-[#00f0ff]",
+      items: [
+        { id: "ref_is_over", label: "Historically 'Over' Ref", type: "boolean" },
+        { id: "ref_is_under", label: "Historically 'Under' Ref", type: "boolean" },
       ]
     }
   ];
